@@ -15,6 +15,7 @@ const { data } = await useFetch<RecipeResponse>("https://dummyjson.com/recipes?l
           <p class="text-2xl mb-8 text-balance">
             Discover recipes helping you to find the easiest way to cook.
           </p>
+
           <BaseBtn label="Browse Recipes" />
         </div>
         <div class="flex-1">
