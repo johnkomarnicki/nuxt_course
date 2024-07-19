@@ -1,27 +1,25 @@
-export interface ApiResponse {
-  dates: {
-    maximum: string;
-    minimum: string;
-  };
-  page: number;
-  results: Movie[];
-  total_pages: number;
-  total_results: number;
+export interface Recipe {
+  id: number;
+  name: string;
+  ingredients: string[];
+  instructions: string[];
+  prepTimeMinutes: number;
+  cookTimeMinutes: number;
+  servings: number;
+  difficulty: string;
+  cuisine: string;
+  caloriesPerServing: number;
+  tags: string[];
+  userId: number;
+  image: string;
+  rating: number;
+  reviewCount: number;
+  mealType: string[];
 }
 
-export interface Movie {
-  adult: boolean;
-  backdrop_path: string;
-  genre_ids: number[];
-  id: number;
-  original_language: string;
-  original_title: string;
-  overview: string;
-  popularity: number;
-  poster_path: string;
-  release_date: string;
-  title: string;
-  video: boolean;
-  vote_average: number;
-  vote_count: number;
+export interface RecipeResponse {
+  recipes: Recipe[];
+  total: number;
+  skip: number;
+  limit: number;
 }
