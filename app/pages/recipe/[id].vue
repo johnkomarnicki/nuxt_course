@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Recipe } from "@/types/types";
+import { type Recipe } from "../../../types/types";
 
 const { id } = useRoute().params;
 const { data } = await useFetch<Recipe>(`https://dummyjson.com/recipes/${id}`);
