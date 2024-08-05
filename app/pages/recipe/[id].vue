@@ -38,16 +38,18 @@ useSeoMeta({
     </div>
 
     <!-- Image -->
-    <img
+    <NuxtImg
       :src="data?.image"
-      class="w-full max-h-[400px] object-cover self-center rounded-md shadow-sm mb-12"
+      densities="x1"
+      sizes="xs:100vw sm:100vw md:100vw lg:100vw"
+      class="w-full max-h-[500px] object-cover rounded-md shadow-sm mb-12"
       alt=""
     />
 
     <!-- Ingredients -->
     <div class="mb-8">
       <h2 class="text-3xl font-semibold mb-4">Ingredients</h2>
-      <ul class="grid grid-cols-2 gap-2 text-lg">
+      <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-lg">
         <li v-for="ingredient in data?.ingredients">
           <label class="flex gap-2 items-center">
             <input class="hidden peer" type="checkbox" />
@@ -72,7 +74,7 @@ useSeoMeta({
           >
             {{ index + 1 }}
           </span>
-          <span>{{ instruction }}</span>
+          <span class="flex-1">{{ instruction }}</span>
         </li>
       </ul>
     </div>

@@ -20,6 +20,10 @@ export default defineNuxtConfig({
       omitLineBreaks: false,
     },
   },
+
+  image: {
+    domains: ["https://cdn.dummyjson.com"],
+  },
   devtools: { enabled: true },
   modules: ["@nuxtjs/tailwindcss", "@nuxt/icon", "@nuxtjs/google-fonts", "@nuxt/image"],
   googleFonts: {
