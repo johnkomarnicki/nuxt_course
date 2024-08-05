@@ -17,20 +17,15 @@ useSeoMeta({
       <h2 class="text-5xl mb-4 font-semibold">{{ data?.name }}</h2>
       <div class="flex gap-4 text-xl mb-6">
         <div class="flex items-center gap-1">
-          <Icon
-            name="mdi:clock-time-eight-outline"
-            width="1.2em"
-            height="1.2em"
-            style="color: #f79f1a"
-          />
+          <Icon name="mdi:clock-time-eight-outline" style="color: #f79f1a" />
           <span>{{ data?.cookTimeMinutes }}</span>
         </div>
         <div class="flex items-center gap-1">
-          <Icon name="mdi:fire" width="1.2em" height="1.2em" style="color: #f79f1a" />
+          <Icon name="mdi:fire" style="color: #f79f1a" />
           <span>{{ data?.caloriesPerServing }}</span>
         </div>
         <div class="flex items-center gap-1">
-          <Icon name="mdi:star" width="1.2em" height="1.2em" style="color: #f79f1a" />
+          <Icon name="mdi:star" style="color: #f79f1a" />
           <span>{{ data?.rating }} ({{ data?.reviewCount }})</span>
         </div>
       </div>
