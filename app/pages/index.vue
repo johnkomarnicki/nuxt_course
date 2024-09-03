@@ -28,11 +28,7 @@ useSeoMeta({
           <p class="text-xl lg:text-2xl mb-8 text-balance">
             Discover recipes helping you to find the easiest way to cook.
           </p>
-          <button
-            class="px-4 py-2 text-white self-start bg-dodgeroll-gold rounded-md text-lg cursor-pointer"
-          >
-            Browse Recipes
-          </button>
+          <BaseBtn label="Browse Recipes" />
         </div>
         <div class="flex-1 order-1 lg:order-2">
           <NuxtImg
@@ -74,16 +70,14 @@ useSeoMeta({
                 <span>{{ recipe.rating }} ({{ recipe.reviewCount }})</span>
               </div>
             </div>
-            <NuxtLink
-              :to="`/recipes/${recipe.id}`"
-              class="px-4 py-2 text-white self-start bg-dodgeroll-gold rounded-md text-base lg:text-lg cursor-pointer"
-            >
-              View
-            </NuxtLink>
+            <BaseBtn :to="`/recipes/${recipe.id}`" label="View" />
           </div>
         </div>
       </div>
       <p v-else class="text-xl">Opps, something went wrong. Please try again later</p>
+    </section>
+    <section class="bg-[#f1f1f1] py-20">
+      <SignupForm />
     </section>
   </main>
 </template>
