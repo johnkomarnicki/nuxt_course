@@ -64,7 +64,7 @@ useSeoMeta({
           <label class="flex gap-2 items-center">
             <input class="hidden peer" type="checkbox" />
             <div
-              class="relative w-6 h-6 rounded-full border-2 border-dodgeroll-gold flex items-center justify-center peer-checked:after:absolute peer-checked:after:w-4 peer-checked:after:h-4 peer-checked:after:bg-dodgeroll-gold peer-checked:after:rounded-full"
+              class="relative w-6 h-6 rounded-full border-2 border-dodgeroll-gold-400 flex items-center justify-center peer-checked:after:absolute peer-checked:after:w-4 peer-checked:after:h-4 peer-checked:after:bg-dodgeroll-gold-400 peer-checked:after:rounded-full"
             ></div>
             <span class="peer-checked:line-through">
               {{ ingredient }}
@@ -80,7 +80,7 @@ useSeoMeta({
       <ul class="flex flex-col text-lg gap-4">
         <li v-for="(instruction, index) in data?.instructions" class="flex gap-2">
           <span
-            class="flex items-center justify-center bg-dodgeroll-gold w-7 h-7 rounded-full text-white text-sm"
+            class="flex items-center justify-center bg-dodgeroll-gold-400 w-7 h-7 rounded-full text-white text-sm"
           >
             {{ index + 1 }}
           </span>
