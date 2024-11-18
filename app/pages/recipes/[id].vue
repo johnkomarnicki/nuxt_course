@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type Recipe } from "../../../types/types";
-
 const { id } = useRoute().params;
+
 const { data, error } = await useFetch<Recipe>(`https://dummyjson.com/recipes/${id}`);
 
 if (error.value) {
@@ -17,7 +17,7 @@ useSeoMeta({
   ogTitle: data.value?.name,
   ogDescription: "Recipes for you to cook!",
   ogImage: data.value?.image,
-  ogUrl: `http:localhost:3001/recipes/${data.value?.id}`,
+  ogUrl: `http:localhost:3000/recipes/${data.value?.id}`,
   twitterTitle: data.value?.name,
   twitterDescription: "Recipes for you to cook!",
   twitterImage: data.value?.image,
@@ -32,15 +32,15 @@ useSeoMeta({
       <h2 class="text-5xl mb-4 font-semibold">{{ data?.name }}</h2>
       <div class="flex gap-4 text-xl mb-6">
         <div class="flex items-center gap-1">
-          <Icon name="mdi:clock-time-eight-outline" style="color: #f79f1a" />
+          <UIcon name="i-mdi-clock-time-eight-outline" class="text-dodgeroll-gold-500" />
           <span>{{ data?.cookTimeMinutes }}</span>
         </div>
         <div class="flex items-center gap-1">
-          <Icon name="mdi:fire" style="color: #f79f1a" />
+          <UIcon name="i-mdi-fire" class="text-dodgeroll-gold-500" />
           <span>{{ data?.caloriesPerServing }}</span>
         </div>
         <div class="flex items-center gap-1">
-          <Icon name="mdi:star" style="color: #f79f1a" />
+          <UIcon name="i-mdi-star" class="text-dodgeroll-gold-500" />
           <span>{{ data?.rating }} ({{ data?.reviewCount }})</span>
         </div>
       </div>
@@ -64,7 +64,7 @@ useSeoMeta({
           <label class="flex gap-2 items-center">
             <input class="hidden peer" type="checkbox" />
             <div
-              class="relative w-6 h-6 rounded-full border-2 border-dodgeroll-gold-400 flex items-center justify-center peer-checked:after:absolute peer-checked:after:w-4 peer-checked:after:h-4 peer-checked:after:bg-dodgeroll-gold-400 peer-checked:after:rounded-full"
+              class="relative w-6 h-6 rounded-full border-2 border-dodgeroll-gold-500 flex items-center justify-center peer-checked:after:absolute peer-checked:after:w-4 peer-checked:after:h-4 peer-checked:after:bg-dodgeroll-gold-500 peer-checked:after:rounded-full"
             ></div>
             <span class="peer-checked:line-through">
               {{ ingredient }}
@@ -80,7 +80,7 @@ useSeoMeta({
       <ul class="flex flex-col text-lg gap-4">
         <li v-for="(instruction, index) in data?.instructions" class="flex gap-2">
           <span
-            class="flex items-center justify-center bg-dodgeroll-gold-400 w-7 h-7 rounded-full text-white text-sm"
+            class="flex items-center justify-center bg-dodgeroll-gold-500 w-7 h-7 rounded-full text-white text-sm"
           >
             {{ index + 1 }}
           </span>
@@ -90,5 +90,3 @@ useSeoMeta({
     </div>
   </div>
 </template>
-
-<style scoped></style>

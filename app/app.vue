@@ -1,6 +1,7 @@
 <template>
-  <div class="font-Montserrat text-dire-wolf">
-    <BaseNavigation />
-    <NuxtPage />
+  <div class="font-Montserrat">
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
   </div>
 </template>
