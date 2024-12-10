@@ -35,10 +35,6 @@ export default defineNuxtConfig({
 
   modules: ["@nuxt/icon", "@nuxtjs/google-fonts", "@nuxt/image", "@nuxt/ui"],
 
-  runtimeConfig: {
-    convertKitKey: process.env.CONVERT_KIT_KEY,
-  },
-
   googleFonts: {
     families: {
       Montserrat: true,
