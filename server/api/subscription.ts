@@ -28,6 +28,7 @@ export default defineEventHandler(async (event) => {
         message: "It looks like you're already subscribed!",
       };
     }
+
     // Return success message
     return {
       title: "Welcome to the newsletter",

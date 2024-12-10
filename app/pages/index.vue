@@ -49,5 +49,8 @@ useSeoMeta({
       </div>
       <p v-else class="text-xl">Opps, something went wrong. Please try again later</p>
     </section>
+    <section class="bg-[#f1f1f1] py-20">
+      <SignupForm />
+    </section>
   </main>
 </template>
