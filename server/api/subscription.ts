@@ -1,6 +1,6 @@
 export default defineEventHandler(async (event) => {
   try {
-    // Obtain body & and convertkit api key
+    // Obtain body & and Kit api key
     const body = await readBody(event);
     const { convertKitKey } = useRuntimeConfig();
 
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
       });
     }
 
-    // Make request to convertKit
+    // Make request to Kit
     const res: any = await $fetch("https://api.convertkit.com/v3/forms/6688199/subscrib", {
       method: "POST",
       body: {
