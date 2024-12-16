@@ -1,21 +1,18 @@
-@@ -1,73 +0,0 @@
 <script setup lang="ts">
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
 
-type Schema = z.output<typeof formSchema>;
 const formSchema = z.object({
   email: z.string().email("Invalid email"),
 });
+
+type Schema = z.output<typeof formSchema>;
+
 const formState = reactive({
   email: "",
 });
 
-const formStatusModal = ref(false);
-const formError = ref(false);
-const formTitle = ref("");
-const formMsg = ref("");
-
+const toast = useToast();
 async function formSubmission(event: FormSubmitEvent<Schema>) {
   try {
     const res = await $fetch("/api/subscription", {
@@ -24,30 +21,14 @@ async function formSubmission(event: FormSubmitEvent<Schema>) {
         email: event.data.email,
       },
     });
-
-    formTitle.value = res.title;
-    formMsg.value = res.message;
-    formStatusModal.value = true;
+    toast.add({ title: res.title, description: res.message });
   } catch {
-    formError.value = true;
+    toast.add({ title: "oops", description: "Something went wrong on our end. Try again later!" });
   }
 }
 </script>
 
 <template>
-  <UModal
-    v-model="formStatusModal"
-    :ui="{
-      width: 'sm:max-w-screen-sm',
-    }"
-  >
-    <div class="flex flex-col p-8">
-      <h1 class="text-3xl mb-2 font-semibold">{{ formTitle }}</h1>
-      <p class="text-xl mb-4">{{ formMsg }}</p>
-      <UButton label="Close" size="xl" class="self-start" @click="formStatusModal = false" />
-    </div>
-  </UModal>
-
   <div class="container max-w-screen-md mx-auto p-10">
     <h1 class="text-4xl lg:text-5xl mb-4 text-balance text-center font-extrabold">
       Recipes Straight To Your Inbox
@@ -66,11 +47,7 @@ async function formSubmission(event: FormSubmitEvent<Schema>) {
       <UFormGroup label="Email" name="email" size="xl">
         <UInput v-model="formState.email" />
       </UFormGroup>
-      <UButton color="dodgeroll-gold" size="xl" label="Join" type="submit" block />
+      <UButton label="Join" type="submit" block />
     </UForm>
-
-    <p v-if="formError" class="mt-4 text-red-500">Something went wrong, please try again later.</p>
   </div>
 </template>
-
-<style scoped></style>

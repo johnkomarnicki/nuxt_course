@@ -1,41 +1,39 @@
+import { ConvertKitData, SubscribersResponse } from "../../types/types";
 export default defineEventHandler(async (event) => {
-  try {
-    // Obtain body & and Kit api key
-    const body = await readBody(event);
-    const { convertKitKey } = useRuntimeConfig();
+  const { kitKey, kitSecret } = useRuntimeConfig();
+  const body = await readBody(event);
 
-    // Check for email
-    if (!body.email) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: "Email address is required",
-      });
-    }
+  if (!body || !body.email) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: "Email address is required",
+    });
+  }
 
-    // Make request to Kit
-    const res: any = await $fetch("https://api.convertkit.com/v3/forms/6688199/subscrib", {
+  const subscriberRes: SubscribersResponse = await $fetch<SubscribersResponse>(
+    `https://api.convertkit.com/v3/subscribers?api_secret=${kitSecret}&email_address=${body.email}`
+  );
+
+  if (subscriberRes.subscribers.length > 0) {
+    return {
+      title: "Already Subscribed",
+      message: "You are already subscribed to the newsletter.",
+    };
+  }
+
+  const res: ConvertKitData = await $fetch<ConvertKitData>(
+    "https://api.convertkit.com/v3/forms/7469549/subscribe",
+    {
       method: "POST",
       body: {
-        api_key: convertKitKey,
+        api_key: kitKey,
         email: body.email,
       },
-    });
-
-    // Check if user is active
-    if (res.subscription.state === "active") {
-      return {
-        title: "Opps",
-        message: "It looks like you're already subscribed!",
-      };
     }
+  );
 
-    // Return success message
-    return {
-      title: "Welcome to the newsletter",
-      message: "Thank's for joining! Please check your email to confirm your subscription.",
-    };
-  } catch {
-    // Handle network errors
-    throw createError({ statusCode: 500, statusMessage: "Internal server error" });
-  }
+  return {
+    title: "Subscription Successful",
+    message: "Thank you for subscribing! Please check your email to confirm.",
+  };
 });
