@@ -23,3 +23,34 @@ export interface RecipeResponse {
   skip: number;
   limit: number;
 }
+
+export interface ConvertKitData {
+  subscription?: {
+    id: number;
+    state: string;
+    created_at: string;
+    source: string;
+    referrer: string | null;
+    subscribable_id: number;
+    subscribable_type: string;
+    subscriber: {
+      id: number;
+    };
+  };
+}
+
+export interface SubscribersResponse {
+  total_subscribers: number;
+  page: number;
+  total_pages: number;
+  subscribers: {
+    id: number;
+    first_name: string;
+    email_address: string;
+    state: string;
+    created_at: string;
+    fields: {
+      last_name: string;
+    };
+  }[];
+}
