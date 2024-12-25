@@ -1,4 +1,7 @@
-import { ConvertKitData, SubscribersResponse } from "../../types/types";
+import {
+  ConvertKitData,
+  SubscribersResponse,
+} from "../../types/types";
 export default defineEventHandler(async (event) => {
   const { kitKey, kitSecret } = useRuntimeConfig();
   const body = await readBody(event);
@@ -10,9 +13,10 @@ export default defineEventHandler(async (event) => {
     });
   }
 
-  const subscriberRes: SubscribersResponse = await $fetch<SubscribersResponse>(
-    `https://api.convertkit.com/v3/subscribers?api_secret=${kitSecret}&email_address=${body.email}`
-  );
+  const subscriberRes: SubscribersResponse =
+    await $fetch<SubscribersResponse>(
+      `https://api.convertkit.com/v3/subscribers?api_secret=${kitSecret}&email_address=${body.email}`
+    );
 
   if (subscriberRes.subscribers.length > 0) {
     return {
@@ -34,6 +38,7 @@ export default defineEventHandler(async (event) => {
 
   return {
     title: "Subscription Successful",
-    message: "Thank you for subscribing! Please check your email to confirm.",
+    message:
+      "Thank you for subscribing! Please check your email to confirm.",
   };
 });

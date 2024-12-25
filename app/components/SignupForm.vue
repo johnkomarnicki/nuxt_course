@@ -23,14 +23,20 @@ async function formSubmission(event: FormSubmitEvent<Schema>) {
     });
     toast.add({ title: res.title, description: res.message });
   } catch {
-    toast.add({ title: "oops", description: "Something went wrong on our end. Try again later!" });
+    toast.add({
+      title: "oops",
+      description:
+        "Something went wrong on our end. Try again later!",
+    });
   }
 }
 </script>
 
 <template>
   <div class="container max-w-screen-md mx-auto p-10">
-    <h1 class="text-4xl lg:text-5xl mb-4 text-balance text-center font-extrabold">
+    <h1
+      class="text-4xl lg:text-5xl mb-4 text-balance text-center font-extrabold"
+    >
       Recipes Straight To Your Inbox
     </h1>
 
