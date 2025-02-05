@@ -1,11 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  compatibilityDate: "2024-04-03",
+
   future: {
     compatibilityVersion: 4,
-  },
-
-  colorMode: {
-    preference: "light",
   },
 
   experimental: {
@@ -21,27 +19,32 @@ export default defineNuxtConfig({
     },
   },
 
+  image: {
+    domains: ["https://cdn.dummyjson.com"],
+  },
+
   unhead: {
     renderSSRHeadOptions: {
       omitLineBreaks: false,
     },
   },
 
-  image: {
-    domains: ["https://cdn.dummyjson.com"],
-  },
-
   devtools: { enabled: true },
 
-  modules: ["@nuxt/icon", "@nuxtjs/google-fonts", "@nuxt/image", "@nuxt/ui"],
-
-  runtimeConfig: {
-    kitKey: process.env.KIT_KEY,
+  colorMode: {
+    preference: "light",
   },
+
+  modules: ["@nuxtjs/google-fonts", "@nuxt/image", "@nuxt/ui"],
 
   googleFonts: {
     families: {
       Montserrat: true,
     },
+  },
+
+  runtimeConfig: {
+    kitKey: process.env.KIT_KEY,
+    kitSecret: process.env.KIT_SECRET,
   },
 });

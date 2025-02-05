@@ -2,22 +2,21 @@
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
 
-const user = useCookie("user");
-const schema = z.object({
+const userCookie = useCookie("user");
+const formSchema = z.object({
   email: z.string().email("Invalid email"),
-  password: z.string(),
+  password: z.string().min(5),
 });
 
-type Schema = z.output<typeof schema>;
+type Schema = z.output<typeof formSchema>;
 
 const formState = reactive({
   email: "",
   password: "",
 });
 
-async function onSubmit(event: FormSubmitEvent<Schema>) {
-  user.value = formState.email;
-
+async function formSubmission(event: FormSubmitEvent<Schema>) {
+  userCookie.value = event.data.email;
   formState.email = "";
   formState.password = "";
 }
@@ -29,28 +28,18 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
   >
     <h1 class="text-xl sm:text-2xl">Login</h1>
     <UForm
-      :schema="schema"
       :state="formState"
-      @submit.prevent="onSubmit"
-      class="flex flex-col gap-3"
+      :schema="formSchema"
+      @submit="formSubmission"
+      class="space-y-4"
     >
-      <div class="flex flex-col">
-        <UFormGroup label="Email" name="email">
-          <UInput v-model="formState.email" />
-        </UFormGroup>
-      </div>
-      <div class="flex flex-col">
-        <UFormGroup label="Password" name="password">
-          <UInput v-model="formState.password" type="password" />
-        </UFormGroup>
-      </div>
-      <UButton
-        class="mt-3"
-        type="submit"
-        label="Sign in"
-        block
-        size="lg"
-      />
+      <UFormGroup label="Email" name="email" size="lg">
+        <UInput v-model="formState.email" />
+      </UFormGroup>
+      <UFormGroup label="Password" name="password" size="lg">
+        <UInput type="password" v-model="formState.password" />
+      </UFormGroup>
+      <UButton type="submit" label="Sign in" block />
     </UForm>
   </div>
 </template>

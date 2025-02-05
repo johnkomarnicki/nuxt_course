@@ -19,7 +19,12 @@
         <li>
           <NuxtLink to="/about">About</NuxtLink>
         </li>
-        <li><NuxtLink to="/login">Login</NuxtLink></li>
+        <li>
+          <NuxtLink to="/admin">Admin</NuxtLink>
+        </li>
+        <li>
+          <NuxtLink to="/login">Login</NuxtLink>
+        </li>
       </ul>
     </nav>
   </header>
