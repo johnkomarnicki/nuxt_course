@@ -12,11 +12,6 @@ defineProps({
       {{ error?.statusCode }}
     </h1>
     <p class="mb-10 text-xl sm:text-3xl">{{ error?.statusMessage }}</p>
-    <NuxtLink
-      to="/"
-      class="px-4 py-2 text-white bg-dodgeroll-gold rounded-md text-lg cursor-pointer"
-    >
-      Go home
-    </NuxtLink>
+    <UButton to="/"> Go home </UButton>
   </section>
 </template>

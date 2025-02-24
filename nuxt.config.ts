@@ -35,7 +35,12 @@ export default defineNuxtConfig({
     preference: "light",
   },
 
-  modules: ["@nuxtjs/google-fonts", "@nuxt/image", "@nuxt/ui"],
+  modules: [
+    "@nuxtjs/google-fonts",
+    "@nuxt/image",
+    "@nuxt/ui",
+    "@nuxtjs/supabase",
+  ],
 
   googleFonts: {
     families: {
@@ -44,7 +49,16 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    public: {
+      apiBase: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
+    },
     kitKey: process.env.KIT_KEY,
     kitSecret: process.env.KIT_SECRET,
+  },
+
+  supabase: {
+    redirectOptions: {
+      exclude: ["/*"],
+    },
   },
 });

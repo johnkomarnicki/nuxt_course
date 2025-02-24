@@ -4,7 +4,6 @@ import type { FormSubmitEvent } from "#ui/types";
 
 const { auth } = useSupabaseClient();
 const toast = useToast();
-const router = useRouter();
 
 const formSchema = z.object({
   email: z.string().email("Invalid email"),
@@ -20,30 +19,18 @@ const formState = reactive({
 
 async function formSubmission(event: FormSubmitEvent<Schema>) {
   try {
-    const { error } = await auth.signInWithPassword({
+    const { data, error } = await auth.signUp({
       email: event.data.email,
       password: event.data.password,
     });
-    router.push("/");
     if (error) throw error;
-  } catch (error: any) {
+    formState.email = "";
+    formState.password = "";
     toast.add({
-      color: "red",
+      color: "green",
       icon: "i-fluent-checkmark-circle-12-filled",
-      title: error.message,
+      title: "Check your email to confirm your account.",
     });
-  }
-}
-
-async function loginWithOAuth() {
-  try {
-    const { error } = await auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${useRuntimeConfig().public.apiBase}/confirm`,
-      },
-    });
-    if (error) throw error;
   } catch (error: any) {
     toast.add({
       color: "red",
@@ -58,15 +45,8 @@ async function loginWithOAuth() {
   <div
     class="bg-[#f1f1f1] max-w-screen-sm mx-auto mt-10 flex flex-col gap-6 rounded-md p-8 text-xs shadow-md sm:p-12 sm:text-sm"
   >
-    <h1 class="text-xl sm:text-2xl">Login</h1>
-    <UButton
-      icon="logos:google-icon"
-      label="Login With Google"
-      color="white"
-      block
-      @click="loginWithOAuth"
-    />
-    <UDivider label="or" />
+    <h1 class="text-xl sm:text-2xl">Signup</h1>
+
     <UForm
       :state="formState"
       :schema="formSchema"
@@ -79,11 +59,11 @@ async function loginWithOAuth() {
       <UFormGroup label="Password" name="password" size="lg">
         <UInput type="password" v-model="formState.password" />
       </UFormGroup>
-      <UButton type="submit" label="Sign in" block />
+      <UButton type="submit" label="Sign up" block />
     </UForm>
     <p class="text-center">
-      Don't have an account?
-      <ULink class="underline" to="/register">Register</ULink>
+      Already have an account?
+      <ULink class="underline" to="/register">Login</ULink>
     </p>
   </div>
 </template>
