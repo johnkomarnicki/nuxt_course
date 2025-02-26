@@ -2,30 +2,43 @@
 import { z } from "zod";
 import type { FormSubmitEvent } from "#ui/types";
 
+definePageMeta({
+  middleware: [
+    (to, from) => {
+      const user = useSupabaseUser();
+      if (user) navigateTo("/");
+    },
+  ],
+});
+
 const { auth } = useSupabaseClient();
 const toast = useToast();
-const router = useRouter();
 
 const formSchema = z.object({
   email: z.string().email("Invalid email"),
-  password: z.string().min(5),
 });
 
 type Schema = z.output<typeof formSchema>;
 
 const formState = reactive({
   email: "",
-  password: "",
 });
 
 async function formSubmission(event: FormSubmitEvent<Schema>) {
   try {
-    const { error } = await auth.signInWithPassword({
+    const { error } = await auth.signInWithOtp({
       email: event.data.email,
-      password: event.data.password,
+      options: {
+        emailRedirectTo: `${useRuntimeConfig().public.apiBase}/confirm`,
+      },
     });
-    router.push("/");
     if (error) throw error;
+    formState.email = "";
+    toast.add({
+      color: "green",
+      icon: "i-fluent-checkmark-circle-12-filled",
+      title: "Please check your email for your magic link",
+    });
   } catch (error: any) {
     toast.add({
       color: "red",
@@ -76,14 +89,7 @@ async function loginWithOAuth() {
       <UFormGroup label="Email" name="email" size="lg">
         <UInput v-model="formState.email" />
       </UFormGroup>
-      <UFormGroup label="Password" name="password" size="lg">
-        <UInput type="password" v-model="formState.password" />
-      </UFormGroup>
       <UButton type="submit" label="Sign in" block />
     </UForm>
-    <p class="text-center">
-      Don't have an account?
-      <ULink class="underline" to="/register">Register</ULink>
-    </p>
   </div>
 </template>
