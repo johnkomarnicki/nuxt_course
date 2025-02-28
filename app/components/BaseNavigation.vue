@@ -2,7 +2,6 @@
 import type { DropdownItem } from "#ui/types";
 
 const user = useSupabaseUser();
-const isAdmin = useIsAdmin();
 
 const items: DropdownItem[][] = [
   [
@@ -10,23 +9,6 @@ const items: DropdownItem[][] = [
       label: user.value?.email || "",
       slot: "account",
       disabled: true,
-    },
-  ],
-  [
-    {
-      label: "Profile",
-      icon: "i-heroicons-user-20-solid",
-      // to: {
-      //   name: "profile-profileId",
-      //   params: {
-      //     profileId: profileUrl.value,
-      //   },
-      // },
-    },
-    {
-      label: "Settings",
-      icon: "i-heroicons-cog-8-tooth",
-      // to: "/profile/settings",
     },
   ],
   [

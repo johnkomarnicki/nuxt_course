@@ -59,6 +59,7 @@ export default defineNuxtConfig({
   supabase: {
     redirectOptions: {
       exclude: ["/*"],
+      callback: "/confirm",
     },
   },
 });
