@@ -15,7 +15,7 @@ const items: DropdownItem[][] = [
     {
       label: "Sign out",
       slot: "signout",
-      icon: "i-heroicons-arrow-left-on-rectangle",
+      icon: "i-mdi-logout",
       click: logout,
     },
   ],
