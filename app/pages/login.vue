@@ -10,7 +10,7 @@ definePageMeta({
     },
   ],
 });
-
+const { apiBase } = useRuntimeConfig().public;
 const { auth } = useSupabaseClient();
 const toast = useToast();
 
@@ -29,20 +29,18 @@ async function formSubmission(event: FormSubmitEvent<Schema>) {
     const { error } = await auth.signInWithOtp({
       email: event.data.email,
       options: {
-        emailRedirectTo: `${useRuntimeConfig().public.apiBase}/confirm`,
+        emailRedirectTo: `${apiBase}/confirm`,
       },
     });
     if (error) throw error;
     formState.email = "";
     toast.add({
       color: "green",
-      icon: "i-fluent-checkmark-circle-12-filled",
       title: "Please check your email for your magic link",
     });
   } catch (error: any) {
     toast.add({
       color: "red",
-      icon: "i-fluent-checkmark-circle-12-filled",
       title: error.message,
     });
   }

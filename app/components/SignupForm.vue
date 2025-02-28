@@ -25,8 +25,7 @@ async function formSubmission(event: FormSubmitEvent<Schema>) {
   } catch {
     toast.add({
       title: "oops",
-      description:
-        "Something went wrong on our end. Try again later!",
+      description: "Something went wrong on our end. Try again later!",
     });
   }
 }
