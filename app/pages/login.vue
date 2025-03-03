@@ -51,14 +51,13 @@ async function loginWithOAuth() {
     const { error } = await auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${useRuntimeConfig().public.apiBase}/confirm`,
+        redirectTo: `${apiBase}/confirm`,
       },
     });
     if (error) throw error;
   } catch (error: any) {
     toast.add({
       color: "red",
-      icon: "i-fluent-checkmark-circle-12-filled",
       title: error.message,
     });
   }
