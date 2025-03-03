@@ -2,6 +2,8 @@
 import type { DropdownItem } from "#ui/types";
 
 const user = useSupabaseUser();
+const { auth } = useSupabaseClient();
+const toast = useToast();
 
 const items: DropdownItem[][] = [
   [
@@ -14,7 +16,6 @@ const items: DropdownItem[][] = [
   [
     {
       label: "Sign out",
-      slot: "signout",
       icon: "i-mdi-logout",
       click: logout,
     },
@@ -22,7 +23,16 @@ const items: DropdownItem[][] = [
 ];
 
 async function logout() {
-  await useLogout();
+  try {
+    const { error } = await auth.signOut();
+    if (error) throw error;
+    navigateTo("/login");
+  } catch (error: any) {
+    toast.add({
+      color: "red",
+      title: error.message,
+    });
+  }
 }
 </script>
 
@@ -49,29 +59,16 @@ async function logout() {
         <UDropdown
           v-if="user"
           :items="items"
-          :ui="{ item: { disabled: 'cursor-text select-text' } }"
           :popper="{ placement: 'bottom-start', arrow: true }"
-          class="hidden md:flex"
         >
-          <UAvatar
-            :src="user?.user_metadata.avatar_url"
-            :alt="user?.user_metadata.email"
-            size="md"
-          />
+          <UAvatar size="md" :alt="user.email" />
           <template #account="{ item }">
             <div class="truncate text-left">
               <p>Signed in as</p>
-              <p class="truncate font-medium text-gray-900 dark:text-white">
+              <p class="truncate font-medium">
                 {{ item.label }}
               </p>
             </div>
-          </template>
-          <template #item="{ item }">
-            <span class="truncate">{{ item.label }}</span>
-            <UIcon
-              :name="item.icon"
-              class="ms-auto h-4 w-4 flex-shrink-0 text-gray-400 dark:text-gray-500"
-            />
           </template>
         </UDropdown>
       </ul>

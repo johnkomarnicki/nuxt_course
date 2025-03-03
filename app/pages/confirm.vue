@@ -1,14 +1,15 @@
 <script setup lang="ts">
-const user = useSupabaseUser();
-
 definePageMeta({
   layout: "no-header",
 });
+
+const user = useSupabaseUser();
 
 watch(
   user,
   () => {
     if (user.value) {
+      // Redirect to protected page
       return navigateTo("/");
     }
   },

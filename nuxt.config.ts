@@ -48,18 +48,17 @@ export default defineNuxtConfig({
     },
   },
 
+  supabase: {
+    redirectOptions: {
+      include: ["/admin"],
+    },
+  },
+
   runtimeConfig: {
     public: {
-      apiBase: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3000",
+      apiBase: process.env.NUXT_PUBLIC_SITE_URL || "http://localhost:3001",
     },
     kitKey: process.env.KIT_KEY,
     kitSecret: process.env.KIT_SECRET,
-  },
-
-  supabase: {
-    redirectOptions: {
-      exclude: ["/*"],
-      callback: "/confirm",
-    },
   },
 });
