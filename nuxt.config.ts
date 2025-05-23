@@ -61,4 +61,8 @@ export default defineNuxtConfig({
     kitKey: process.env.KIT_KEY,
     kitSecret: process.env.KIT_SECRET,
   },
+
+  devServer: {
+    port: 3001,
+  },
 });

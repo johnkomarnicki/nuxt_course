@@ -10,7 +10,7 @@ definePageMeta({
   <main>
     <section class="container py-20">
       <h1 class="text-3xl mb-6 text-balance">
-        Welcome back, {{ user }}
+        Welcome back, {{ userInfo.name }}
       </h1>
     </section>
   </main>
