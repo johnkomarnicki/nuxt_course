@@ -5,7 +5,6 @@ const user = useSupabaseUser();
 const { userInfo } = useUserInfo();
 const { auth } = useSupabaseClient();
 const toast = useToast();
-const showCreateRecipe = ref(false);
 
 const items: DropdownItem[][] = [
   [
@@ -15,12 +14,12 @@ const items: DropdownItem[][] = [
       disabled: true,
     },
     {
-      label: "Profile",
+      label: "My Profile",
       click: toProfile,
     },
     {
-      label: "Create Recipe",
-      to: "/recipes/create",
+      label: "Profile Settings",
+      to: "/profile/settings",
     },
   ],
   [
