@@ -1,6 +1,4 @@
-<script setup lang="ts">
-const { userInfo } = useUserInfo();
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <main class="flex flex-col gap-8 container py-20">
@@ -12,12 +10,10 @@ const { userInfo } = useUserInfo();
             placeholder: 'text-white',
           }"
           size="3xl"
-          :alt="`${userInfo?.name}`"
-          :src="`${userInfo?.avatar}`"
         />
-        <p class="text-3xl">{{ userInfo.name }}</p>
+        <p class="text-3xl"></p>
       </div>
-      <ULink class="ml-auto" to="/profile/settings">
+      <ULink class="ml-auto">
         <UIcon class="text-4xl" name="mdi-settings-outline" />
       </ULink>
     </section>
