@@ -11,7 +11,7 @@ export const useUserInfo = () => {
         .from("profiles")
         .select("*")
         .eq("id", user.value?.id as string)
-        .maybeSingle();
+        .single();
 
       if (data) userInfo.value = data;
     }

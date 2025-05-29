@@ -75,11 +75,7 @@ async function logout() {
           :items="items"
           :popper="{ placement: 'bottom-start', arrow: true }"
         >
-          <UAvatar
-            size="md"
-            :src="`${userInfo?.avatar}`"
-            :alt="`${userInfo?.name}`"
-          />
+          <UAvatar size="md" :src="userInfo?.avatar" :alt="userInfo?.name" />
           <template #account="{ item }">
             <div class="truncate text-left">
               <p>Signed in as</p>

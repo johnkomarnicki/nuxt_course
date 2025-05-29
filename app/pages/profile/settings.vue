@@ -8,9 +8,8 @@ const client = useSupabaseClient<Database>();
 const user = useSupabaseUser();
 const toast = useToast();
 
-console.log(userInfo.value);
-
 const formSchema = z.object({
+  avatar: z.string().optional(),
   email: z.string().email(),
   name: z.string().min(1),
 });
@@ -18,18 +17,25 @@ const formSchema = z.object({
 type Schema = z.output<typeof formSchema>;
 
 const formState = reactive({
-  email: userInfo.value.email || "",
-  name: userInfo.value.name || "",
+  avatar: userInfo.value.avatar || undefined,
+  email: userInfo.value.email || undefined,
+  name: userInfo.value.name || undefined,
 });
 
 const avatarFile = ref<File | undefined>(undefined);
-const avatarPublicUrl = ref<string>();
-const avatarLocalUrl = ref<string>();
+const avatarPublicUrl = ref<string | undefined>(undefined);
+const avatarLocalUrl = ref<string | undefined>(undefined);
+
 function handleFileUpload(file: FileList) {
   if (file[0]) {
     avatarFile.value = file[0];
     avatarLocalUrl.value = URL.createObjectURL(avatarFile.value);
   }
+}
+
+function handleResetFileInput() {
+  avatarFile.value = undefined;
+  avatarPublicUrl.value = undefined;
 }
 
 const updatingProfile = ref(false);
@@ -42,9 +48,8 @@ async function formSubmission(event: FormSubmitEvent<Schema>) {
         .from("avatars")
         .upload(
           `${user.value?.id}/${avatarFile.value?.name}`,
-          avatarFile.value as File,
+          avatarFile.value,
           {
-            cacheControl: "3600",
             upsert: true,
           }
         );
@@ -63,11 +68,12 @@ async function formSubmission(event: FormSubmitEvent<Schema>) {
       .from("profiles")
       .update({
         name: event.data.name,
-        avatar: avatarPublicUrl.value || formState.avatar,
+        avatar: avatarPublicUrl.value,
       })
       .eq("id", user.value?.id as string);
 
     setUserInfo(true);
+    handleResetFileInput();
     toast.add({
       title: "Profile Updated",
     });
@@ -97,8 +103,8 @@ async function formSubmission(event: FormSubmitEvent<Schema>) {
         <p class="font-medium text-sm text-gray-700">Avatar</p>
         <UAvatar
           size="3xl"
-          :src="`${avatarLocalUrl || userInfo?.avatar}`"
-          :alt="`${userInfo?.name}`"
+          :src="avatarLocalUrl || userInfo.avatar"
+          :alt="userInfo?.name"
         />
         <UFormGroup name="avatar" size="lg">
           <template #label>
