@@ -1,8 +1,31 @@
 <script setup lang="ts">
-const { userInfo } = useUserInfo();
-const recipes = ref([]);
+import type { Database } from "~~/types/database.types";
 
-const showCreateRecipe = ref(false);
+const { id } = useRoute().params;
+const client = useSupabaseClient<Database>();
+
+const { data: profileData, error } = await useAsyncData(async () => {
+  const { data, error } = await client
+    .from("profiles")
+    .select("*")
+    .eq("id", id as string)
+    .single();
+
+  return { data, error };
+});
+
+// Handle Error
+if (profileData.value?.error || error.value) {
+  const statusCode = profileData.value?.error ? 400 : error.value?.statusCode;
+  const statusMessage = profileData.value?.error
+    ? "Profile Not Found"
+    : error.value?.statusMessage;
+
+  throw createError({
+    statusCode: statusCode,
+    statusMessage: statusMessage,
+  });
+}
 </script>
 
 <template>
@@ -15,25 +38,14 @@ const showCreateRecipe = ref(false);
             placeholder: 'text-white',
           }"
           size="3xl"
-          :alt="`${userInfo?.name}`"
-          :src="`${userInfo?.avatar}`"
+          :alt="profileData?.data?.name!"
+          :src="profileData?.data?.avatar!"
         />
-        <p class="text-3xl">{{ userInfo.name }}</p>
+        <p class="text-3xl">{{ profileData?.data?.name }}</p>
       </div>
-      <ULink class="ml-auto" to="/profile/settings">
+      <ULink class="ml-auto">
         <UIcon class="text-4xl" name="mdi-settings-outline" />
       </ULink>
-    </section>
-    <section class="flex flex-col py-8">
-      <div class="flex items-center gap-2 mb-8">
-        <h1 class="text-3xl">My recipes</h1>
-        <UButton size="sm" class="ml-auto" to="/recipes/create">
-          Create Recipe
-        </UButton>
-      </div>
-      <div v-if="recipes.length === 0">
-        <p>You don't currently have any recipes.</p>
-      </div>
     </section>
   </main>
 </template>
