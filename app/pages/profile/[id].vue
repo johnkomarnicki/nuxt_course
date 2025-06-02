@@ -2,7 +2,9 @@
 import type { Database } from "~~/types/database.types";
 
 const { id } = useRoute().params;
+const user = useSupabaseUser();
 const client = useSupabaseClient<Database>();
+const isUserProfile = id === user.value?.id;
 
 const { data: profileData, error } = await useAsyncData(async () => {
   const { data, error } = await client
@@ -11,38 +13,41 @@ const { data: profileData, error } = await useAsyncData(async () => {
     .eq("id", id as string)
     .single();
 
+  if (error) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: "Profile Not Found",
+    });
+  }
+
   return { data, error };
 });
 
-// Handle Error
-if (profileData.value?.error || error.value) {
-  const statusCode = profileData.value?.error ? 400 : error.value?.statusCode;
-  const statusMessage = profileData.value?.error
-    ? "Profile Not Found"
-    : error.value?.statusMessage;
-
+if (error.value) {
   throw createError({
-    statusCode: statusCode,
-    statusMessage: statusMessage,
+    statusCode: error.value?.statusCode,
+    statusMessage: error.value?.statusMessage,
   });
 }
 
 useSeoMeta({
   title: `Profile - ${
-    profileData.value?.data?.name || profileData.value?.data?.email
+    profileData.value?.data.name || profileData.value?.data.email
   }`,
   description: "Recipes for you to cook!",
-  ogTitle: `Nuxtcipes | ${
-    profileData.value?.data?.name || profileData.value?.data?.email
+  ogTitle: `Profile - ${
+    profileData.value?.data.name || profileData.value?.data.email
   }`,
   ogDescription: "Recipes for you to cook!",
-  ogImage: `${profileData.value?.data?.avatar || "/nuxt-course-hero.png"}`,
-  ogUrl: `${useRuntimeConfig().public.apiBase}/profile/settings`,
-  twitterTitle: `Nuxtcipes | ${
-    profileData.value?.data?.name || profileData.value?.data?.email
+  ogImage: `${profileData.value?.data.avatar || "/nuxt-course-hero.png"}`,
+  ogUrl: `${useRuntimeConfig().public.apiBase}/profile/${
+    profileData.value?.data.id
+  }`,
+  twitterTitle: `Profile - ${
+    profileData.value?.data.name || profileData.value?.data.email
   }`,
   twitterDescription: "Recipes for you to cook!",
-  twitterImage: `${profileData.value?.data?.avatar || "/nuxt-course-hero.png"}`,
+  twitterImage: `${profileData.value?.data.avatar || "/nuxt-course-hero.png"}`,
   twitterCard: "summary",
 });
 </script>
@@ -62,7 +67,7 @@ useSeoMeta({
         />
         <p class="text-3xl">{{ profileData?.data?.name }}</p>
       </div>
-      <ULink class="ml-auto" to="/profile/settings">
+      <ULink v-if="isUserProfile" to="/profile/settings" class="ml-auto">
         <UIcon class="text-4xl" name="mdi-settings-outline" />
       </ULink>
     </section>

@@ -4,12 +4,14 @@ definePageMeta({
 });
 
 const user = useSupabaseUser();
+const { setUserInfo } = useUserInfo();
 
 watch(
   user,
-  () => {
+  async () => {
     if (user.value) {
       // Redirect to protected page
+      await setUserInfo();
       return navigateTo("/");
     }
   },

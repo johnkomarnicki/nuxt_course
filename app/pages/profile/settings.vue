@@ -5,8 +5,6 @@ import type { Database } from "~~/types/database.types";
 
 const { userInfo, setUserInfo } = useUserInfo();
 const client = useSupabaseClient<Database>();
-const user = useSupabaseUser();
-const toast = useToast();
 
 const formSchema = z.object({
   avatar: z.string().optional(),
@@ -17,15 +15,14 @@ const formSchema = z.object({
 type Schema = z.output<typeof formSchema>;
 
 const formState = reactive({
-  avatar: userInfo.value.avatar || undefined,
-  email: userInfo.value.email || undefined,
-  name: userInfo.value.name || undefined,
+  avatar: userInfo.value?.avatar,
+  email: userInfo.value?.email,
+  name: userInfo.value?.name,
 });
 
 const avatarFile = ref<File | undefined>(undefined);
 const avatarLocalUrl = ref<string | undefined>(undefined);
 const avatarPublicUrl = ref<string | undefined>(undefined);
-
 function handleFileUpload(file: FileList) {
   if (file[0]) {
     avatarFile.value = file[0];
@@ -33,47 +30,43 @@ function handleFileUpload(file: FileList) {
   }
 }
 
-function handleResetFileInput() {
-  avatarFile.value = undefined;
-  avatarPublicUrl.value = undefined;
-}
-
 const updatingProfile = ref(false);
+const toast = useToast();
 async function formSubmission(event: FormSubmitEvent<Schema>) {
   try {
     updatingProfile.value = true;
-
     if (avatarFile.value) {
-      const { error: storageError } = await client.storage
+      const { error } = await client.storage
         .from("avatars")
         .upload(
-          `${user.value?.id}/${avatarFile.value?.name}`,
+          `${userInfo.value?.id}/${avatarFile.value.name}`,
           avatarFile.value,
           {
             upsert: true,
           }
         );
 
-      if (storageError) throw storageError;
+      if (error) throw error;
 
-      // Get public url
       const { data } = client.storage
         .from("avatars")
-        .getPublicUrl(`${user.value?.id}/${avatarFile.value?.name}`);
+        .getPublicUrl(`${userInfo.value?.id}/${avatarFile.value.name}`);
 
       avatarPublicUrl.value = data.publicUrl;
     }
 
-    await client
+    const { error } = await client
       .from("profiles")
       .update({
         name: event.data.name,
         avatar: avatarPublicUrl.value,
       })
-      .eq("id", user.value?.id as string);
+      .eq("id", userInfo.value?.id as string);
 
+    if (error) throw error;
     setUserInfo(true);
-    handleResetFileInput();
+    avatarFile.value = undefined;
+    avatarPublicUrl.value = undefined;
     toast.add({
       title: "Profile Updated",
     });
@@ -116,8 +109,9 @@ useSeoMeta({
         <p class="font-medium text-sm text-gray-700">Avatar</p>
         <UAvatar
           size="3xl"
-          :src="avatarLocalUrl || userInfo.avatar"
-          :alt="userInfo?.name"
+          :ui="{ background: 'bg-primary', placeholder: 'text-white' }"
+          :alt="userInfo?.name!"
+          :src="avatarLocalUrl || userInfo?.avatar!"
         />
         <UFormGroup name="avatar" size="lg">
           <template #label>
@@ -125,26 +119,32 @@ useSeoMeta({
               <UButton
                 icon="mdi-cloud-upload"
                 label="Upload Avatar"
-                class="pointer-events-none"
                 size="md"
+                class="pointer-events-none"
               />
             </div>
           </template>
-          <UInput class="hidden" type="file" @change="handleFileUpload" />
+          <UInput
+            class="hidden"
+            type="file"
+            accept=".png, .jpg"
+            v-model="formState.avatar!"
+            @change="handleFileUpload"
+          />
         </UFormGroup>
       </div>
-      <UFormGroup label="Email" name="email" size="xl">
-        <UInput disabled v-model="formState.email" />
+      <UFormGroup label="Email" name="email" size="lg">
+        <UInput v-model="formState.email!" disabled />
       </UFormGroup>
-      <UFormGroup label="Name" name="name" size="xl">
-        <UInput v-model="formState.name" />
+      <UFormGroup label="Name" name="name" size="lg">
+        <UInput v-model="formState.name!" />
       </UFormGroup>
       <UButton
         :loading="updatingProfile"
         class="mt-5"
-        type="submit"
-        block
         label="Update"
+        block
+        type="submit"
       />
     </UForm>
   </div>

@@ -1,8 +1,11 @@
 <script lang="ts" setup>
 const { setUserInfo } = useUserInfo();
+const user = useSupabaseUser();
 
 await callOnce(async () => {
-  await setUserInfo();
+  if (user.value) {
+    await setUserInfo();
+  }
 });
 </script>
 
