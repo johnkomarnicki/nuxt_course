@@ -26,6 +26,25 @@ if (profileData.value?.error || error.value) {
     statusMessage: statusMessage,
   });
 }
+
+useSeoMeta({
+  title: `Profile - ${
+    profileData.value?.data?.name || profileData.value?.data?.email
+  }`,
+  description: "Recipes for you to cook!",
+  ogTitle: `Nuxtcipes | ${
+    profileData.value?.data?.name || profileData.value?.data?.email
+  }`,
+  ogDescription: "Recipes for you to cook!",
+  ogImage: `${profileData.value?.data?.avatar || "/nuxt-course-hero.png"}`,
+  ogUrl: `${useRuntimeConfig().public.apiBase}/profile/settings`,
+  twitterTitle: `Nuxtcipes | ${
+    profileData.value?.data?.name || profileData.value?.data?.email
+  }`,
+  twitterDescription: "Recipes for you to cook!",
+  twitterImage: `${profileData.value?.data?.avatar || "/nuxt-course-hero.png"}`,
+  twitterCard: "summary",
+});
 </script>
 
 <template>
@@ -43,7 +62,7 @@ if (profileData.value?.error || error.value) {
         />
         <p class="text-3xl">{{ profileData?.data?.name }}</p>
       </div>
-      <ULink class="ml-auto">
+      <ULink class="ml-auto" to="/profile/settings">
         <UIcon class="text-4xl" name="mdi-settings-outline" />
       </ULink>
     </section>

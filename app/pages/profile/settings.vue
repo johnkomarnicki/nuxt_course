@@ -23,8 +23,8 @@ const formState = reactive({
 });
 
 const avatarFile = ref<File | undefined>(undefined);
-const avatarPublicUrl = ref<string | undefined>(undefined);
 const avatarLocalUrl = ref<string | undefined>(undefined);
+const avatarPublicUrl = ref<string | undefined>(undefined);
 
 function handleFileUpload(file: FileList) {
   if (file[0]) {
@@ -79,13 +79,26 @@ async function formSubmission(event: FormSubmitEvent<Schema>) {
     });
   } catch (error: any) {
     toast.add({
-      title: "Error creating recipe",
+      title: "Error updating profile",
       description: error.message,
     });
   } finally {
     updatingProfile.value = false;
   }
 }
+
+useSeoMeta({
+  title: "Profile Settings",
+  description: "Recipes for you to cook!",
+  ogTitle: "Profile Settings",
+  ogDescription: "Recipes for you to cook!",
+  ogImage: "/nuxt-course-hero.png",
+  ogUrl: `${useRuntimeConfig().public.apiBase}/profile/settings`,
+  twitterTitle: "Profile Settings",
+  twitterDescription: "Recipes for you to cook!",
+  twitterImage: "/nuxt-course-hero.png",
+  twitterCard: "summary",
+});
 </script>
 
 <template>
