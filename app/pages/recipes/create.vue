@@ -1,13 +1,8 @@
 <script setup lang="ts">
-import { object, z } from "zod";
+import { z } from "zod";
 import type { FormSubmitEvent, FormError } from "#ui/types";
 import type { Database } from "~~/types/database.types";
 
-defineProps({
-  modelValue: Boolean,
-});
-
-const emit = defineEmits(["update:modelValue"]);
 const client = useSupabaseClient<Database>();
 const user = useSupabaseUser();
 
@@ -187,23 +182,23 @@ async function formSubmission(event: FormSubmitEvent<Schema>) {
       <UFormGroup label="Cook Time (Minutes)" name="cookTimeMinutes" size="xl">
         <UInput v-model="formState.cookTimeMinutes" type="number" />
       </UFormGroup>
-      <UFormGroup
-        :ui="{ hint: 'text-xs' }"
-        hint="*Press Enter/Return to add item to the list."
-        label="Ingredients"
-        name="ingredients"
-        size="xl"
-      >
-        <UInput
-          @keydown.enter.prevent="addIngredient"
-          v-model="formState.ingredient"
-        >
-        </UInput>
+      <UFormGroup label="Ingredients" name="ingredients" size="xl">
+        <div class="flex gap-2">
+          <UInput
+            @keydown.enter.prevent="addIngredient"
+            v-model="formState.ingredient"
+            placeholder="Enter ingredient name"
+            class="flex-1"
+          />
+          <UButton
+            @click="addIngredient"
+            icon="i-heroicons-plus"
+            label="Add"
+            :disabled="!formState.ingredient || !formState.ingredient.trim()"
+          />
+        </div>
       </UFormGroup>
-      <ul
-        v-if="formState.ingredientList.length !== 0"
-        class="grid grid-cols-2 gap-x-8 gap-y-2 py-2"
-      >
+      <ul v-if="formState.ingredientList.length !== 0" class="space-y-2 py-2">
         <CreateListItem
           v-for="(ingredient, index) in formState.ingredientList"
           @removeItem="removeIngredient(index)"
@@ -212,22 +207,23 @@ async function formSubmission(event: FormSubmitEvent<Schema>) {
           :item="ingredient"
         />
       </ul>
-      <UFormGroup
-        :ui="{ hint: 'text-xs' }"
-        hint="*Press Enter/Return to add item to the list."
-        label="Instructions"
-        name="instructions"
-        size="xl"
-      >
-        <UInput
-          @keydown.enter.prevent="addInstruction"
-          v-model="formState.instruction"
-        />
+      <UFormGroup label="Instructions" name="instructions" size="xl">
+        <div class="flex gap-2">
+          <UInput
+            @keydown.enter.prevent="addInstruction"
+            v-model="formState.instruction"
+            placeholder="Enter instruction step"
+            class="flex-1"
+          />
+          <UButton
+            @click="addInstruction"
+            icon="i-heroicons-plus"
+            label="Add"
+            :disabled="!formState.instruction || !formState.instruction.trim()"
+          />
+        </div>
       </UFormGroup>
-      <ul
-        v-if="formState.instructionList.length > 0"
-        class="grid grid-cols-2 gap-x-8 gap-y-2 py-2"
-      >
+      <ul v-if="formState.instructionList.length > 0" class="space-y-2 py-2">
         <CreateListItem
           v-for="(instruction, index) in formState.instructionList"
           @removeItem="removeInstruction(index)"

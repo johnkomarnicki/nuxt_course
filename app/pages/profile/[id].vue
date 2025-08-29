@@ -1,8 +1,6 @@
 <script setup lang="ts">
 const { userInfo } = useUserInfo();
 const recipes = ref([]);
-
-const showCreateRecipe = ref(false);
 </script>
 
 <template>
