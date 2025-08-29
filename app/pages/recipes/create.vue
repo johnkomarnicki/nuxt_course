@@ -1,15 +1,6 @@
 <script setup lang="ts">
-import { object, z } from "zod";
-import type { FormSubmitEvent, FormError } from "#ui/types";
-import type { Database } from "~~/types/database.types";
-
-defineProps({
-  modelValue: Boolean,
-});
-
-const emit = defineEmits(["update:modelValue"]);
-const client = useSupabaseClient<Database>();
-const user = useSupabaseUser();
+import { z } from "zod";
+import type { FormSubmitEvent } from "#ui/types";
 
 const recipeForm = ref();
 
@@ -23,7 +14,7 @@ const formSchema = z.object({
 
 type Schema = z.output<typeof formSchema>;
 
-const getInitialFormState = () => ({
+const formState = reactive({
   image: undefined,
   name: undefined,
   cookTimeMinutes: undefined,
@@ -33,108 +24,7 @@ const getInitialFormState = () => ({
   instructionList: [] as string[],
 });
 
-const formState = reactive(getInitialFormState());
-
-function resetForm() {
-  recipeImageFile.value = undefined;
-  recipeLocalUrl.value = undefined;
-  Object.assign(formState, getInitialFormState());
-}
-
-function addIngredient() {
-  if (formState.ingredient) {
-    formState.ingredientList.push(formState.ingredient);
-    formState.ingredient = undefined;
-    recipeForm.value.clear("ingredients");
-  }
-}
-
-function removeIngredient(index: number) {
-  formState.ingredientList.splice(index, 1);
-}
-
-function addInstruction() {
-  if (formState.instruction) {
-    formState.instructionList.push(formState.instruction);
-    formState.instruction = undefined;
-    recipeForm.value.clear("instructions");
-  }
-}
-
-function removeInstruction(index: number) {
-  formState.instructionList.splice(index, 1);
-}
-
-const recipeImageFile = ref<File | undefined>(undefined);
-const recipeLocalUrl = ref<string | undefined>(undefined);
-function handleFileUpload(file: FileList) {
-  if (file[0]) {
-    recipeImageFile.value = file[0];
-    recipeLocalUrl.value = URL.createObjectURL(recipeImageFile.value);
-  }
-}
-
-function validate(state: any): FormError[] {
-  const errors = [];
-  if (state.ingredientList.length === 0) {
-    errors.push({
-      path: "ingredients",
-      message: "You must have at least one ingredient",
-    });
-  }
-  if (state.instructionList.length === 0) {
-    errors.push({
-      path: "instructions",
-      message: "You must have at least one instruction",
-    });
-  }
-  return errors;
-}
-
-const toast = useToast();
-async function formSubmission(event: FormSubmitEvent<Schema>) {
-  try {
-    // Upload Image
-    const { error: storageError } = await client.storage
-      .from("recipes")
-      .upload(
-        `${user.value?.id}/${recipeImageFile.value?.name}`,
-        recipeImageFile.value as File,
-        {
-          cacheControl: "3600",
-          upsert: true,
-        }
-      );
-
-    if (storageError) throw storageError;
-
-    // Get public url
-    const { data } = client.storage
-      .from("recipes")
-      .getPublicUrl(`${user.value?.id}/${recipeImageFile.value?.name}`);
-
-    // Create Recipe
-    const { error: recipeError } = await client.from("recipes").insert({
-      image_url: data.publicUrl,
-      name: event.data.name,
-      cookTimeMinutes: event.data.cookTimeMinutes,
-      ingredients: formState.ingredientList,
-      instructions: formState.instructionList,
-    });
-
-    if (recipeError) throw recipeError;
-
-    toast.add({
-      title: "Recipe Created",
-    });
-    resetForm();
-  } catch (error: any) {
-    toast.add({
-      title: "Error creating recipe",
-      description: error.message,
-    });
-  }
-}
+async function formSubmission(event: FormSubmitEvent<Schema>) {}
 </script>
 
 <template>
@@ -146,96 +36,9 @@ async function formSubmission(event: FormSubmitEvent<Schema>) {
       ref="recipeForm"
       :state="formState"
       :schema="formSchema"
-      :validate="validate"
       @submit="formSubmission"
       class="flex flex-col gap-4"
     >
-      <div class="flex flex-col gap-3">
-        <p class="font-medium text-base text-gray-700">Image</p>
-        <div
-          class="h-[250px] w-full flex items-center justify-center bg-white/50 rounded-md"
-        >
-          <img
-            v-if="recipeLocalUrl"
-            class="h-full w-full object-cover rounded-md shadow-sm"
-            :src="`${recipeLocalUrl}`"
-          />
-          <UIcon v-else name="mdi-photo-library" class="text-black text-7xl" />
-        </div>
-        <UFormGroup name="image">
-          <template #label>
-            <div class="cursor-pointer">
-              <UButton
-                icon="mdi-cloud-upload"
-                label="Upload Image"
-                class="pointer-events-none"
-                size="md"
-              />
-            </div>
-          </template>
-          <UInput
-            class="hidden"
-            v-model="formState.image"
-            type="file"
-            @change="handleFileUpload"
-          />
-        </UFormGroup>
-      </div>
-      <UFormGroup label="Name" name="name" size="xl">
-        <UInput v-model="formState.name" />
-      </UFormGroup>
-      <UFormGroup label="Cook Time (Minutes)" name="cookTimeMinutes" size="xl">
-        <UInput v-model="formState.cookTimeMinutes" type="number" />
-      </UFormGroup>
-      <UFormGroup
-        :ui="{ hint: 'text-xs' }"
-        hint="*Press Enter/Return to add item to the list."
-        label="Ingredients"
-        name="ingredients"
-        size="xl"
-      >
-        <UInput
-          @keydown.enter.prevent="addIngredient"
-          v-model="formState.ingredient"
-        >
-        </UInput>
-      </UFormGroup>
-      <ul
-        v-if="formState.ingredientList.length !== 0"
-        class="grid grid-cols-2 gap-x-8 gap-y-2 py-2"
-      >
-        <CreateListItem
-          v-for="(ingredient, index) in formState.ingredientList"
-          @removeItem="removeIngredient(index)"
-          :key="index"
-          :index="index"
-          :item="ingredient"
-        />
-      </ul>
-      <UFormGroup
-        :ui="{ hint: 'text-xs' }"
-        hint="*Press Enter/Return to add item to the list."
-        label="Instructions"
-        name="instructions"
-        size="xl"
-      >
-        <UInput
-          @keydown.enter.prevent="addInstruction"
-          v-model="formState.instruction"
-        />
-      </UFormGroup>
-      <ul
-        v-if="formState.instructionList.length > 0"
-        class="grid grid-cols-2 gap-x-8 gap-y-2 py-2"
-      >
-        <CreateListItem
-          v-for="(instruction, index) in formState.instructionList"
-          @removeItem="removeInstruction(index)"
-          :key="index"
-          :index="index"
-          :item="instruction"
-        />
-      </ul>
       <UButton class="mt-5" label="Create" type="submit" block />
     </UForm>
   </div>
