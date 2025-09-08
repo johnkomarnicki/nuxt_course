@@ -2,8 +2,10 @@
 import type { DropdownItem } from "#ui/types";
 
 const user = useSupabaseUser();
+const { userInfo } = useUserInfo();
 const { auth } = useSupabaseClient();
 const toast = useToast();
+const showCreateRecipe = ref(false);
 
 const items: DropdownItem[][] = [
   [
@@ -11,6 +13,14 @@ const items: DropdownItem[][] = [
       label: user.value?.email || "",
       slot: "account",
       disabled: true,
+    },
+    {
+      label: "Profile",
+      click: toProfile,
+    },
+    {
+      label: "Create Recipe",
+      to: "/recipes/create",
     },
   ],
   [
@@ -21,6 +31,10 @@ const items: DropdownItem[][] = [
     },
   ],
 ];
+
+function toProfile() {
+  navigateTo(`/profile/${user.value?.id}`);
+}
 
 async function logout() {
   try {
@@ -56,12 +70,17 @@ async function logout() {
         <li v-if="!user">
           <NuxtLink to="/login">Login</NuxtLink>
         </li>
+
         <UDropdown
           v-if="user"
           :items="items"
           :popper="{ placement: 'bottom-start', arrow: true }"
         >
-          <UAvatar size="md" :alt="user.email" />
+          <UAvatar
+            size="md"
+            :src="`${userInfo?.avatar}`"
+            :alt="`${userInfo?.name}`"
+          />
           <template #account="{ item }">
             <div class="truncate text-left">
               <p>Signed in as</p>
