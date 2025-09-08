@@ -18,15 +18,17 @@ const formSchema = z.object({
 
 type Schema = z.output<typeof formSchema>;
 
-const getInitialFormState = () => ({
-  image: undefined,
-  name: undefined,
-  cookTimeMinutes: undefined,
-  ingredient: undefined,
-  ingredientList: [] as string[],
-  instruction: undefined,
-  instructionList: [] as string[],
-});
+function getInitialFormState() {
+  return {
+    image: undefined,
+    name: undefined,
+    cookTimeMinutes: undefined,
+    ingredient: undefined,
+    ingredientList: [] as string[],
+    instruction: undefined,
+    instructionList: [] as string[],
+  };
+}
 
 const formState = reactive(getInitialFormState());
 
@@ -194,7 +196,7 @@ async function formSubmission(event: FormSubmitEvent<Schema>) {
             @click="addIngredient"
             icon="i-heroicons-plus"
             label="Add"
-            :disabled="!formState.ingredient || !formState.ingredient.trim()"
+            :disabled="!formState.ingredient"
           />
         </div>
       </UFormGroup>
