@@ -99,7 +99,6 @@ async function formSubmission(event: FormSubmitEvent<Schema>) {
         recipeImageFile.value as File,
         {
           cacheControl: "3600",
-          upsert: true,
         }
       );
 
