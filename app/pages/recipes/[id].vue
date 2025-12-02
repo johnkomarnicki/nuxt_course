@@ -1,8 +1,16 @@
 <script setup lang="ts">
-import { type Recipe } from "../../../types/types";
+import { type Database } from "~~/types/database.types";
+const supabase = useSupabaseClient<Database>();
 const { id } = useRoute().params;
 
-const { data, error } = await useFetch<Recipe>(`https://dummyjson.com/recipes/${id}`);
+const { data: recipes, error } = await useAsyncData(async () => {
+  const { data } = await supabase
+    .from("recipes")
+    .select()
+    .eq("id", Number(id))
+    .single();
+  return data;
+});
 
 if (error.value) {
   throw createError({
@@ -12,15 +20,15 @@ if (error.value) {
 }
 
 useSeoMeta({
-  title: data.value?.name,
+  title: recipes.value?.name,
   description: "Recipes for you to cook!",
-  ogTitle: data.value?.name,
+  ogTitle: recipes.value?.name,
   ogDescription: "Recipes for you to cook!",
-  ogImage: data.value?.image,
-  ogUrl: `http:localhost:3000/recipes/${data.value?.id}`,
-  twitterTitle: data.value?.name,
+  ogImage: recipes.value?.image,
+  ogUrl: `http:localhost:3000/recipes/${recipes.value?.id}`,
+  twitterTitle: recipes.value?.name,
   twitterDescription: "Recipes for you to cook!",
-  twitterImage: data.value?.image,
+  twitterImage: recipes.value?.image,
   twitterCard: "summary",
 });
 </script>
@@ -29,19 +37,22 @@ useSeoMeta({
   <div class="flex flex-col max-w-screen-lg container py-20">
     <!-- Header -->
     <div class="flex flex-col mb-6">
-      <h2 class="text-5xl mb-4 font-semibold">{{ data?.name }}</h2>
+      <h2 class="text-5xl mb-4 font-semibold">{{ recipes?.name }}</h2>
       <div class="flex gap-4 text-xl mb-6">
         <div class="flex items-center gap-1">
-          <UIcon name="i-mdi-clock-time-eight-outline" class="text-dodgeroll-gold-500" />
-          <span>{{ data?.cookTimeMinutes }}</span>
+          <UIcon
+            name="i-mdi-clock-time-eight-outline"
+            class="text-dodgeroll-gold-500"
+          />
+          <span>{{ recipes?.cookTimeMinutes }}</span>
         </div>
         <div class="flex items-center gap-1">
           <UIcon name="i-mdi-fire" class="text-dodgeroll-gold-500" />
-          <span>{{ data?.caloriesPerServing }}</span>
+          <span>{{ recipes?.caloriesPerServing }}</span>
         </div>
         <div class="flex items-center gap-1">
           <UIcon name="i-mdi-star" class="text-dodgeroll-gold-500" />
-          <span>{{ data?.rating }} ({{ data?.reviewCount }})</span>
+          <span>{{ recipes?.rating }} ({{ recipes?.reviewCount }})</span>
         </div>
       </div>
       <hr />
@@ -49,7 +60,7 @@ useSeoMeta({
 
     <!-- Image -->
     <NuxtImg
-      :src="data?.image"
+      :src="recipes?.image"
       densities="x1"
       sizes="xs:100vw sm:100vw md:100vw lg:100vw"
       class="w-full max-h-[500px] object-cover rounded-md shadow-sm mb-12"
@@ -60,7 +71,7 @@ useSeoMeta({
     <div class="mb-8">
       <h2 class="text-3xl font-semibold mb-4">Ingredients</h2>
       <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-lg">
-        <li v-for="ingredient in data?.ingredients">
+        <li v-for="ingredient in recipes?.ingredients">
           <label class="flex gap-2 items-center">
             <input class="hidden peer" type="checkbox" />
             <div
@@ -78,7 +89,10 @@ useSeoMeta({
     <div>
       <h2 class="text-3xl font-medium mb-4">Instructions</h2>
       <ul class="flex flex-col text-lg gap-4">
-        <li v-for="(instruction, index) in data?.instructions" class="flex gap-2">
+        <li
+          v-for="(instruction, index) in recipes?.instructions"
+          class="flex gap-2"
+        >
           <span
             class="flex items-center justify-center bg-dodgeroll-gold-500 w-7 h-7 rounded-full text-white text-sm"
           >
