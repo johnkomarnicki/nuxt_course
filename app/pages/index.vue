@@ -1,12 +1,17 @@
 <script setup lang="ts">
 import { type Database, type Tables } from "~~/types/database.types";
+
 import type { RecipeFormState } from "~~/types/types";
 
 const supabase = useSupabaseClient<Database>();
 const user = useSupabaseUser();
 const toast = useToast();
 
-const { data: recipes, error, refresh } = await useAsyncData(async () => {
+const {
+  data: recipes,
+  error,
+  refresh,
+} = await useAsyncData(async () => {
   const { data } = await supabase.from("recipes").select().is("user_id", null);
   return data;
 });

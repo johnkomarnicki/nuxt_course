@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type Database, type Tables } from "~~/types/database.types";
+import { type Database } from "~~/types/database.types";
 import type { RecipeFormState } from "~~/types/types";
 
 const client = useSupabaseClient<Database>();

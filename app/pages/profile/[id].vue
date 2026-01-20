@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { type Database, type Tables } from "~~/types/database.types";
+import type { Database, Tables } from "~~/types/database.types";
 import type { RecipeFormState } from "~~/types/types";
-
-import type { Database } from "~~/types/database.types";
 
 const { id } = useRoute().params;
 const user = useSupabaseUser();
@@ -25,7 +23,7 @@ const { data: profileData, error } = await useAsyncData(async () => {
 
   const { data: recipes, error: recipesError } = await client
     .from("recipes")
-    .select()
+    .select("*")
     .eq("user_id", id as string);
 
   return { data, error, recipes, recipesError };
@@ -36,6 +34,108 @@ if (error.value) {
     statusCode: error.value?.statusCode,
     statusMessage: error.value?.statusMessage,
   });
+}
+
+const isEditModalOpen = ref(false);
+const selectedRecipe = ref<Tables<"recipes"> | undefined>(undefined);
+
+function handleEdit(recipe: Tables<"recipes">) {
+  selectedRecipe.value = recipe;
+  isEditModalOpen.value = true;
+}
+
+const toast = useToast();
+
+async function handleUpdateRecipe(
+  formState: RecipeFormState,
+  imageFile: File | undefined
+) {
+  try {
+    let imageUrl = selectedRecipe.value?.image;
+
+    if (imageFile) {
+      const { error: storageError } = await client.storage
+        .from("recipes")
+        .upload(`${user.value?.id}/${imageFile?.name}`, imageFile as File);
+
+      if (storageError) throw storageError;
+
+      // Get public url
+      const { data } = client.storage
+        .from("recipes")
+        .getPublicUrl(`${user.value?.id}/${imageFile?.name}`);
+
+      imageUrl = data.publicUrl;
+    }
+
+    const { data, error: recipeError } = await client
+      .from("recipes")
+      .update({
+        image: imageUrl,
+        name: formState.name,
+        cookTimeMinutes: formState.cookTimeMinutes,
+        caloriesPerServing: formState.caloriesPerServing,
+        ingredients: formState.ingredientList,
+        instructions: formState.instructionList,
+      })
+      .eq("id", selectedRecipe.value?.id!)
+      .select("*")
+      .single();
+
+    if (recipeError) throw recipeError;
+
+    if (profileData.value?.recipes && data) {
+      const recipeIndex = profileData.value.recipes.findIndex(
+        (r: Tables<"recipes">) => r.id === data.id
+      );
+
+      if (recipeIndex !== -1) {
+        profileData.value.recipes[recipeIndex] = data;
+      }
+    }
+
+    toast.add({
+      title: "Recipe Updated",
+    });
+
+    isEditModalOpen.value = false;
+  } catch (error: any) {
+    toast.add({
+      title: "Error updating recipe",
+      description: error.message,
+      color: "red",
+    });
+  }
+}
+
+async function handleDeleteRecipe(recipe: Tables<"recipes">) {
+  try {
+    const { error } = await client.from("recipes").delete().eq("id", recipe.id);
+
+    if (error) throw error;
+
+    if (recipe.image) {
+      const imagePath = recipe.image.split("/").slice(-2).join("/");
+      await client.storage.from("recipes").remove([imagePath]);
+    }
+
+    // Remove the deleted recipe from the local array
+    if (profileData.value?.recipes) {
+      profileData.value.recipes = profileData.value.recipes.filter(
+        (r: Tables<"recipes">) => r.id !== recipe.id
+      );
+    }
+
+    toast.add({
+      title: "Recipe Deleted",
+    });
+  } catch (error: any) {
+    toast.add({
+      title: "Error deleting recipe",
+      description: error.message,
+      color: "red",
+    });
+  }
 }
 
 useSeoMeta({
@@ -58,102 +158,15 @@ useSeoMeta({
   twitterImage: `${profileData.value?.data.avatar || "/nuxt-course-hero.png"}`,
   twitterCard: "summary",
 });
-
-const isEditModalOpen = ref(false);
-const selectedRecipe = ref<Tables<"recipes"> | undefined>(undefined);
-
-function handleEdit(recipe: Tables<"recipes">) {
-  selectedRecipe.value = recipe;
-  isEditModalOpen.value = true;
-}
-
-async function handleUpdateRecipe(
-  formState: RecipeFormState,
-  imageFile: File | undefined
-) {
-  try {
-    if (!selectedRecipe.value) return;
-
-    let imageUrl = selectedRecipe.value.image;
-
-    // Upload new image if provided
-    if (imageFile) {
-      const { error: storageError } = await supabase.storage
-        .from("recipes")
-        .upload(`${userInfo.value?.id}/${imageFile.name}`, imageFile);
-
-      if (storageError) throw storageError;
-
-      // Get public url
-      const { data } = supabase.storage
-        .from("recipes")
-        .getPublicUrl(`${userInfo.value?.id}/${imageFile.name}`);
-
-      imageUrl = data.publicUrl;
-    }
-
-    // Update Recipe
-    const { error: recipeError } = await supabase
-      .from("recipes")
-      .update({
-        image: imageUrl,
-        name: formState.name,
-        cookTimeMinutes: formState.cookTimeMinutes,
-        caloriesPerServing: formState.calories,
-        ingredients: formState.ingredientList,
-        instructions: formState.instructionList,
-      })
-      .eq("id", selectedRecipe.value.id);
-
-    if (recipeError) throw recipeError;
-
-    toast.add({
-      title: "Recipe Updated",
-    });
-
-    isEditModalOpen.value = false;
-    await refresh();
-  } catch (error: any) {
-    toast.add({
-      title: "Error updating recipe",
-      description: error.message,
-      color: "red",
-    });
-  }
-}
-
-async function handleDeleteRecipe(recipe: Tables<"recipes">) {
-  try {
-    // Delete recipe from database
-    const { error: recipeError } = await supabase
-      .from("recipes")
-      .delete()
-      .eq("id", recipe.id);
-
-    if (recipeError) throw recipeError;
-
-    // Optionally delete the image from storage
-    if (recipe.image) {
-      const imagePath = recipe.image.split("/").slice(-2).join("/");
-      await supabase.storage.from("recipes").remove([imagePath]);
-    }
-
-    toast.add({
-      title: "Recipe Deleted",
-    });
-
-    await refresh();
-  } catch (error: any) {
-    toast.add({
-      title: "Error deleting recipe",
-      description: error.message,
-      color: "red",
-    });
-  }
-}
 </script>
 
 <template>
+  <UModal v-model="isEditModalOpen">
+    <div class="p-6">
+      <h2 class="text-xl sm:text-2xl mb-4">Edit Recipe</h2>
+      <RecipeForm :recipe="selectedRecipe" @submit="handleUpdateRecipe" />
+    </div>
+  </UModal>
   <main class="flex flex-col gap-8 container py-20">
     <section class="flex items-center bg-[#f1f1f1] p-8 rounded-md shadow-md">
       <div class="flex items-center gap-2">
@@ -163,12 +176,12 @@ async function handleDeleteRecipe(recipe: Tables<"recipes">) {
             placeholder: 'text-white',
           }"
           size="3xl"
-          :alt="`${profileData?.data?.name}`"
-          :src="`${profileData?.data?.avatar}`"
+          :alt="profileData?.data?.name!"
+          :src="profileData?.data?.avatar!"
         />
-        <p class="text-3xl">{{ profileData?.data.name }}</p>
+        <p class="text-3xl">{{ profileData?.data?.name }}</p>
       </div>
-      <ULink class="ml-auto" to="/profile/settings">
+      <ULink v-if="isUserProfile" to="/profile/settings" class="ml-auto">
         <UIcon class="text-4xl" name="mdi-settings-outline" />
       </ULink>
     </section>
@@ -179,24 +192,18 @@ async function handleDeleteRecipe(recipe: Tables<"recipes">) {
           Create Recipe
         </UButton>
       </div>
-      <div v-if="!profileData?.recipes || profileData?.recipes.length === 0">
+      <div v-if="profileData?.recipes?.length === 0">
         <p>You don't currently have any recipes.</p>
       </div>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <RecipeCard
           v-for="recipe in profileData?.recipes"
+          :key="recipe.id"
           :recipe="recipe"
           @edit="handleEdit"
           @delete="handleDeleteRecipe"
         />
       </div>
     </section>
-
-    <UModal v-model="isEditModalOpen">
-      <div class="p-6">
-        <h2 class="text-xl sm:text-2xl mb-4">Edit Recipe</h2>
-        <RecipeForm :recipe="selectedRecipe" @submit="handleUpdateRecipe" />
-      </div>
-    </UModal>
   </main>
 </template>

@@ -59,7 +59,7 @@ export interface RecipeFormState {
   image: string | undefined;
   name: string | undefined;
   cookTimeMinutes: number | undefined;
-  calories: number | undefined;
+  caloriesPerServing: number | undefined;
   ingredient: string | undefined;
   ingredientList: string[];
   instruction: string | undefined;
